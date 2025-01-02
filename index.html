@@ -4,7 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>更新管理</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>">
   <style>
+    a{
+      text-decoration: none;
+    }
     body {
       font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
       padding: 12px;
@@ -189,111 +193,115 @@
     </div>
   </div>
 
-  <script>
-    const subscriptions = [
-      { name: "Perplexity", date: "2025-07-19", price: 0, type: "yearly", willContinue: false },
-      { name: "Qobuz", date: "2025-01-15", price: 0, type: "monthly", willContinue: false },
-      { name: "Zaim", date: "2025-03-21", price: 4800, type: "yearly", willContinue: false },
-      { name: "MoneyTree", date: "2025-11-12", price: 3600, type: "yearly", willContinue: false },
-      { name: "Tile", date: "2025-11-13", price: 3600, type: "yearly", willContinue: false },
-      { name: "Audible", date: "2025-01-09", price: 0, type: "monthly", willContinue: false },
-      { name: "ATOK", date: "2025-12-27", price: 7920, type: "yearly", willContinue: false },
-      { name: "日本通信", date: "2025-01-22", price: 1370, type: "monthly", willContinue: true },
-      { name: "YouTube Premium", date: "2026-04-23", price: 12800, type: "yearly", willContinue: false },
-      { name: "Biglobe", date: "2025-10-31", price: 4500, type: "monthly", willContinue: false, contractTerm: "2年契約" }
-    ];
+<script>
+  const subscriptions = [
+  { name: "Perplexity", date: "2025-07-19", price: 0, type: "yearly", willContinue: false, url: "https://www.perplexity.ai/" },
+  { name: "Qobuz", date: "2025-01-15", price: 0, type: "monthly", willContinue: false, url: "https://www.qobuz.com/" },
+  { name: "Zaim", date: "2025-03-21", price: 4800, type: "yearly", willContinue: false, url: "https://zaim.net/" },
+  { name: "MoneyTree", date: "2025-11-12", price: 3600, type: "yearly", willContinue: false, url: "https://getmoneytree.com/" },
+  { name: "Tile", date: "2025-11-13", price: 3600, type: "yearly", willContinue: false, url: "https://www.thetileapp.com/" },
+  { name: "Audible", date: "2025-01-09", price: 0, type: "monthly", willContinue: false, url: "https://www.audible.com/" },
+  { name: "ATOK", date: "2025-12-27", price: 7920, type: "yearly", willContinue: false, url: "https://www.atok.com/" },
+  { name: "日本通信", date: "2025-01-22", price: 1370, type: "monthly", willContinue: true, url: "https://www.nihon-tsushin.com/" },
+  { name: "YouTube Premium", date: "2026-04-23", price: 12800, type: "yearly", willContinue: true, url: "https://www.youtube.com/premium" },
+  { name: "Biglobe", date: "2025-10-31", price: 4500, type: "monthly", willContinue: true, contractTerm: "2年契約", url: "https://www.biglobe.ne.jp/" }
+];
 
-    function getStatus(date) {
-      const today = new Date();
-      const endDate = new Date(date);
-      return endDate >= today ? "active" : "expired";
-    }
+function getStatus(date) {
+  const today = new Date();
+  const endDate = new Date(date);
+  return endDate >= today ? "active" : "expired";
+}
 
-    function getDaysRemaining(date) {
-      const today = new Date();
-      const endDate = new Date(date);
-      const diffTime = endDate - today;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      return diffDays >= 0 ? diffDays : 0;
-    }
+function getDaysRemaining(date) {
+  const today = new Date();
+  const endDate = new Date(date);
+  const diffTime = endDate - today;
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays >= 0 ? diffDays : 0;
+}
 
-    function renderTotalSummary(totalMonthly, totalYearly) {
-      const totalSummaryDiv = document.getElementById('total-summary');
-      const annualTotal = totalMonthly * 12 + totalYearly;
-      const monthlyEquivalent = Math.ceil(annualTotal / 12);
+function renderTotalSummary(totalMonthly, totalYearly, continueTotalMonthly, continueTotalYearly) {
+  const totalSummaryDiv = document.getElementById('total-summary');
+  const annualTotal = totalMonthly * 12 + totalYearly;
+  const monthlyEquivalent = Math.ceil(annualTotal / 12);
+  const continueAnnualTotal = continueTotalMonthly * 12 + continueTotalYearly;
+  const continueMonthlyEquivalent = Math.ceil(continueAnnualTotal / 12);
 
-      totalSummaryDiv.innerHTML = `
-        <div class="amount-card">
-          <p class="amount-label">年間総額</p>
-          <p class="amount-value">${annualTotal.toLocaleString()}円</p>
+  totalSummaryDiv.innerHTML = `
+    <div class="amount-card">
+      <p class="amount-label">年間総額（全て継続）</p>
+      <p class="amount-value">${annualTotal.toLocaleString()}円</p>
+      <p class="amount-label">月額換算（全て継続）</p>
+      <p class="amount-value">${monthlyEquivalent.toLocaleString()}円</p>
+    </div>
+    <div class="amount-card">
+      <p class="amount-label">年間総額（継続予定のみ）</p>
+      <p class="amount-value">${continueAnnualTotal.toLocaleString()}円</p>
+      <p class="amount-label">月額換算（継続予定のみ）</p>
+      <p class="amount-value">${continueMonthlyEquivalent.toLocaleString()}円</p>
+    </div>
+  `;
+}
+
+function renderSummary(type, totalAnnual, monthlyEquivalent) {
+  const summaryDiv = document.getElementById(`${type}-summary`);
+  summaryDiv.textContent = `年間合計: ${totalAnnual.toLocaleString()}円 (月額換算: ${monthlyEquivalent.toLocaleString()}円)`;
+}
+
+function renderCards() {
+  const monthlyContainer = document.getElementById("monthly");
+  const yearlyContainer = document.getElementById("yearly");
+  let totalMonthly = 0;
+  let totalYearly = 0;
+  let continueTotalMonthly = 0;
+  let continueTotalYearly = 0;
+
+  subscriptions.forEach(sub => {
+    const status = getStatus(sub.date);
+    const daysRemaining = getDaysRemaining(sub.date);
+    const card = document.createElement("a");
+    card.href = sub.url;
+    card.target = "_blank";
+    card.className = `card ${status}`;
+    card.innerHTML = `
+      <div class="card-main">
+        <h3>${sub.name}</h3>
+        <p>期限: ${sub.date}</p>
+        ${sub.contractTerm ? `<p class="contract-term">${sub.contractTerm}</p>` : ""}
+        <p class="days-remaining">${daysRemaining > 0 ? `あと ${daysRemaining} 日` : "期限切れ"}</p>
+      </div>
+      <div class="card-side">
+        <div class="price-info">
+          <p>${sub.price.toLocaleString()}円</p>
+          ${sub.type === "yearly" ? `<p>(月${(sub.price / 12).toLocaleString()}円)</p>` : `<p>(年${(sub.price * 12).toLocaleString()}円)</p>`}
         </div>
-        <div class="amount-card">
-          <p class="amount-label">月額換算</p>
-          <p class="amount-value">${monthlyEquivalent.toLocaleString()}円</p>
+        <div class="continuation-status ${sub.willContinue ? 'continuation-yes' : 'continuation-no'}">
+          ${sub.willContinue ? '継続予定' : '継続未定'}
         </div>
-      `;
+      </div>
+    `;
+
+    if (sub.type === "monthly") {
+      monthlyContainer.appendChild(card);
+      totalMonthly += sub.price;
+      if (sub.willContinue) continueTotalMonthly += sub.price;
+    } else if (sub.type === "yearly") {
+      yearlyContainer.appendChild(card);
+      totalYearly += sub.price;
+      if (sub.willContinue) continueTotalYearly += sub.price;
     }
+  });
 
-    function renderSummary(type, totalAnnual, monthlyEquivalent) {
-      const summaryDiv = document.getElementById(`${type}-summary`);
-      summaryDiv.textContent = `年間合計: ${totalAnnual.toLocaleString()}円 (月額換算: ${monthlyEquivalent.toLocaleString()}円)`;
-    }
+  const monthlyEquivalent = Math.ceil(totalYearly / 12);
+  renderSummary("monthly", totalMonthly * 12, totalMonthly);
+  renderSummary("yearly", totalYearly, monthlyEquivalent);
+  renderTotalSummary(totalMonthly, totalYearly, continueTotalMonthly, continueTotalYearly);
+}
 
-    function renderCards() {
-      const monthlyContainer = document.getElementById("monthly");
-      const yearlyContainer = document.getElementById("yearly");
+// 初期表示
+renderCards();
 
-      let totalMonthly = 0;
-      let totalYearly = 0;
-
-      subscriptions.forEach(sub => {
-        const status = getStatus(sub.date);
-        const daysRemaining = getDaysRemaining(sub.date);
-        const card = document.createElement("div");
-        card.className = `card ${status}`;
-        card.innerHTML = `
-          <div class="card-main">
-            <h3>${sub.name}</h3>
-            <p>期限: ${sub.date}</p>
-            ${
-              sub.contractTerm
-                ? `<p class="contract-term">${sub.contractTerm}</p>`
-                : ""
-            }
-            <p class="days-remaining">${daysRemaining > 0 ? `あと ${daysRemaining} 日` : "期限切れ"}</p>
-          </div>
-          <div class="card-side">
-            <div class="price-info">
-              <p>${sub.price.toLocaleString()}円</p>
-              ${
-                sub.type === "yearly"
-                  ? `<p>(月${(sub.price / 12).toLocaleString()}円)</p>`
-                  : ""
-              }
-            </div>
-            <div class="continuation-status ${sub.willContinue ? 'continuation-yes' : 'continuation-no'}">
-              ${sub.willContinue ? '継続予定' : '継続未定'}
-            </div>
-          </div>
-        `;
-
-        if (sub.type === "monthly") {
-          monthlyContainer.appendChild(card);
-          totalMonthly += sub.price;
-        } else if (sub.type === "yearly") {
-          yearlyContainer.appendChild(card);
-          totalYearly += sub.price;
-        }
-      });
-
-      const monthlyEquivalent = Math.ceil(totalYearly / 12);
-      renderSummary("monthly", totalMonthly * 12, totalMonthly);
-      renderSummary("yearly", totalYearly, monthlyEquivalent);
-      renderTotalSummary(totalMonthly, totalYearly);
-    }
-
-    // 初期表示
-    renderCards();
-  </script>
+</script>
 </body>
 </html>
