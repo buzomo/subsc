@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>更新管理</title>
+  <style>
+    body {
+      font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+      padding: 12px;
+      background-color: #f3f4f6;
+      line-height: 1.4;
+      color: #333;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+    h1 {
+      font-size: 24px;
+      color: #1a1a1a;
+      margin: 0 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #2563eb;
+    }
+    .total-summary {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .total-summary h2 {
+      font-size: 18px;
+      color: #1a1a1a;
+      margin: 0 0 8px;
+    }
+    .total-amount {
+      display: flex;
+      gap: 16px;
+    }
+    .amount-card {
+      flex: 1;
+      background-color: #f8fafc;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border-left: 3px solid #2563eb;
+    }
+    .amount-card p {
+      margin: 2px 0;
+    }
+    .amount-label {
+      font-size: 13px;
+      color: #64748b;
+    }
+    .amount-value {
+      font-size: 20px;
+      font-weight: bold;
+      color: #1e40af;
+    }
+    .zone {
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .zone h2 {
+      font-size: 18px;
+      margin: 0 0 8px;
+      color: #1a1a1a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .zone h2::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background-color: #e5e7eb;
+    }
+    .zone .summary {
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: #4b5563;
+      background-color: #f8fafc;
+      padding: 6px 10px;
+      border-radius: 4px;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+    }
+    .card {
+      border-radius: 6px;
+      padding: 12px;
+      background-color: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s ease;
+      border: 1px solid #e5e7eb;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+    .card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .card.active {
+      background-color: #f0fdf4;
+      border-left: 4px solid #22c55e;
+    }
+    .card.expired {
+      background-color: #f8fafc;
+      border-left: 4px solid #94a3b8;
+    }
+    .card-main {
+      grid-column: 1;
+    }
+    .card-side {
+      grid-column: 2;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .continuation-status {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .continuation-yes {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+    .continuation-no {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+    .card h3 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      color: #1a1a1a;
+    }
+    .card p {
+      margin: 2px 0;
+      font-size: 13px;
+      color: #4b5563;
+    }
+    .card .days-remaining {
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+    .contract-term {
+      font-size: 11px;
+      color: #6b7280;
+      font-style: italic;
+    }
+    .price-info {
+      text-align: right;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>更新管理</h1>
+
+    <div class="total-summary">
+      <h2>総額サマリー</h2>
+      <div class="total-amount" id="total-summary"></div>
+    </div>
+
+    <div class="zone">
+      <h2>月次更新</h2>
+      <div class="summary" id="monthly-summary"></div>
+      <div class="cards" id="monthly"></div>
+    </div>
+
+    <div class="zone">
+      <h2>年次更新</h2>
+      <div class="summary" id="yearly-summary"></div>
+      <div class="cards" id="yearly"></div>
+    </div>
+  </div>
+
+  <script>
+    const subscriptions = [
+      { name: "Perplexity", date: "2025-07-19", price: 0, type: "yearly", willContinue: false },
+      { name: "Qobuz", date: "2025-01-15", price: 0, type: "monthly", willContinue: false },
+      { name: "Zaim", date: "2025-03-21", price: 4800, type: "yearly", willContinue: false },
+      { name: "MoneyTree", date: "2025-11-12", price: 3600, type: "yearly", willContinue: false },
+      { name: "Tile", date: "2025-11-13", price: 3600, type: "yearly", willContinue: false },
+      { name: "Audible", date: "2025-01-09", price: 0, type: "monthly", willContinue: false },
+      { name: "ATOK", date: "2025-12-27", price: 7920, type: "yearly", willContinue: false },
+      { name: "日本通信", date: "2025-01-22", price: 1370, type: "monthly", willContinue: true },
+      { name: "YouTube Premium", date: "2026-04-23", price: 12800, type: "yearly", willContinue: false },
+      { name: "Biglobe", date: "2025-10-31", price: 4500, type: "monthly", willContinue: false, contractTerm: "2年契約" }
+    ];
+
+    function getStatus(date) {
+      const today = new Date();
+      const endDate = new Date(date);
+      return endDate >= today ? "active" : "expired";
+    }
+
+    function getDaysRemaining(date) {
+      const today = new Date();
+      const endDate = new Date(date);
+      const diffTime = endDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays >= 0 ? diffDays : 0;
+    }
+
+    function renderTotalSummary(totalMonthly, totalYearly) {
+      const totalSummaryDiv = document.getElementById('total-summary');
+      const annualTotal = totalMonthly * 12 + totalYearly;
+      const monthlyEquivalent = Math.ceil(annualTotal / 12);
+
+      totalSummaryDiv.innerHTML = `
+        <div class="amount-card">
+          <p class="amount-label">年間総額</p>
+          <p class="amount-value">${annualTotal.toLocaleString()}円</p>
+        </div>
+        <div class="amount-card">
+          <p class="amount-label">月額換算</p>
+          <p class="amount-value">${monthlyEquivalent.toLocaleString()}円</p>
+        </div>
+      `;
+    }
+
+    function renderSummary(type, totalAnnual, monthlyEquivalent) {
+      const summaryDiv = document.getElementById(`${type}-summary`);
+      summaryDiv.textContent = `年間合計: ${totalAnnual.toLocaleString()}円 (月額換算: ${monthlyEquivalent.toLocaleString()}円)`;
+    }
+
+    function renderCards() {
+      const monthlyContainer = document.getElementById("monthly");
+      const yearlyContainer = document.getElementById("yearly");
+
+      let totalMonthly = 0;
+      let totalYearly = 0;
+
+      subscriptions.forEach(sub => {
+        const status = getStatus(sub.date);
+        const daysRemaining = getDaysRemaining(sub.date);
+        const card = document.createElement("div");
+        card.className = `card ${status}`;
+        card.innerHTML = `
+          <div class="card-main">
+            <h3>${sub.name}</h3>
+            <p>期限: ${sub.date}</p>
+            ${
+              sub.contractTerm
+                ? `<p class="contract-term">${sub.contractTerm}</p>`
+                : ""
+            }
+            <p class="days-remaining">${daysRemaining > 0 ? `あと ${daysRemaining} 日` : "期限切れ"}</p>
+          </div>
+          <div class="card-side">
+            <div class="price-info">
+              <p>${sub.price.toLocaleString()}円</p>
+              ${
+                sub.type === "yearly"
+                  ? `<p>(月${(sub.price / 12).toLocaleString()}円)</p>`
+                  : ""
+              }
+            </div>
+            <div class="continuation-status ${sub.willContinue ? 'continuation-yes' : 'continuation-no'}">
+              ${sub.willContinue ? '継続予定' : '継続未定'}
+            </div>
+          </div>
+        `;
+
+        if (sub.type === "monthly") {
+          monthlyContainer.appendChild(card);
+          totalMonthly += sub.price;
+        } else if (sub.type === "yearly") {
+          yearlyContainer.appendChild(card);
+          totalYearly += sub.price;
+        }
+      });
+
+      const monthlyEquivalent = Math.ceil(totalYearly / 12);
+      renderSummary("monthly", totalMonthly * 12, totalMonthly);
+      renderSummary("yearly", totalYearly, monthlyEquivalent);
+      renderTotalSummary(totalMonthly, totalYearly);
+    }
+
+    // 初期表示
+    renderCards();
+  </script>
+</body>
+</html>
