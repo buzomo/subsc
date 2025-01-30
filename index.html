@@ -208,7 +208,6 @@
     <h1>更新管理</h1>
 
     <div class="total-summary">
-      <h2>総額サマリー</h2>
       <div class="total-amount" id="total-summary"></div>
     </div>
 
@@ -227,16 +226,9 @@
 
   <script>
     const subscriptions = [
-      { name: "Kindle Unlimited", date: "2025-01-14", price: 980, type: "monthly", willContinue: false, url: "https://www.amazon.co.jp/gp/kindle/ku/ku_central?ref_=nav_AccountFlyout_ku" },
       { name: "Perplexity", date: "2025-07-19", price: 0, type: "yearly", willContinue: false, url: "https://www.perplexity.ai/" },
-      { name: "Qobuz", date: "2025-01-15", price: 0, type: "monthly", willContinue: false, url: "https://www.qobuz.com/" },
-      { name: "Zaim", date: "2025-03-21", price: 4800, type: "yearly", willContinue: false, url: "https://zaim.net/" },
-      { name: "MoneyTree", date: "2025-11-12", price: 3600, type: "yearly", willContinue: false, url: "https://getmoneytree.com/" },
-      { name: "Tile", date: "2025-11-13", price: 3600, type: "yearly", willContinue: false, url: "https://www.thetileapp.com/" },
-      { name: "Audible", date: "2025-01-09", price: 0, type: "monthly", willContinue: false, url: "https://www.audible.com/" },
-      { name: "ATOK", date: "2025-12-27", price: 7920, type: "yearly", willContinue: false, url: "https://www.atok.com/" },
-      { name: "日本通信", date: "2025-01-22", price: 1370, type: "monthly", willContinue: true, url: "https://www.nihon-tsushin.com/" },
-      { name: "YouTube Premium", date: "2026-04-23", price: 12800, type: "yearly", willContinue: true, url: "https://www.youtube.com/premium" },
+      { name: "日本通信", date: "2025-02-21", price: 1370, type: "monthly", willContinue: true, url: "https://mypage.bmobile.ne.jp/josso/signon/login.do?josso_back_to=https://mypage.bmobile.ne.jp/checkout/josso_security_check&josso_partnerapp_host=mypage.bmobile.ne.jp&josso_partnerapp_ctx=/checkout" },
+      { name: "YouTube Premium", date: "2026-04-23", price: 12800, type: "yearly", willContinue: false, url: "https://www.youtube.com/premium" },
       { name: "Biglobe", date: "2025-10-31", price: 4500, type: "monthly", willContinue: true, contractTerm: "2年契約", url: "https://www.biglobe.ne.jp/" }
     ];
 
@@ -263,15 +255,17 @@
 
       totalSummaryDiv.innerHTML = `
     <div class="amount-card">
-      <p class="amount-label">年間総額（全て継続）</p>
+      <h2>全て継続したとき</h2>
+      <p class="amount-label">年間</p>
       <p class="amount-value">${annualTotal.toLocaleString()}円</p>
-      <p class="amount-label">月額換算（全て継続）</p>
+      <p class="amount-label">月額あたり</p>
       <p class="amount-value">${monthlyEquivalent.toLocaleString()}円</p>
     </div>
     <div class="amount-card">
-      <p class="amount-label">年間総額（継続予定のみ）</p>
+      <h2>継続予定のみ</h2>
+      <p class="amount-label">年間</p>
       <p class="amount-value">${continueAnnualTotal.toLocaleString()}円</p>
-      <p class="amount-label">月額換算（継続予定のみ）</p>
+      <p class="amount-label">月あたり</p>
       <p class="amount-value">${continueMonthlyEquivalent.toLocaleString()}円</p>
     </div>
   `;
@@ -279,7 +273,7 @@
 
     function renderSummary(type, totalAnnual, monthlyEquivalent) {
       const summaryDiv = document.getElementById(`${type}-summary`);
-      summaryDiv.textContent = `年間合計: ${totalAnnual.toLocaleString()}円 (月額換算: ${monthlyEquivalent.toLocaleString()}円)`;
+      summaryDiv.textContent = `年間: ${totalAnnual.toLocaleString()}円 (月あたり: ${monthlyEquivalent.toLocaleString()}円)`;
     }
     function handleKeyPress(event) {
       if (event.key === 'e' || event.key === 'E') {
